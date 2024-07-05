@@ -2,7 +2,7 @@
 """Unit test for utils"""
 
 import unittest
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 from parameterized import parameterized
 from unittest.mock import patch, Mock
 
@@ -34,16 +34,18 @@ class TestGetJson(unittest.TestCase):
         test get json
     """
 
-    @parameterized.expand([
-        ("http://example.com", {"payload": True})
-        ("http://holberton.io", {"payload": False})
-        ])
-    @patch('get_json.requests.get')
-    def test_get_json(self, test_url, test_deployed, mock_data):
-        mock_json = Mock(return_value=test_deployed)
+    @parameterized.expand(
+        [
+            ("http://example.com", {"payload": True}),
+            ("http://holberton.io", {"payload": False}),
+        ]
+    )
+    @patch('requests.get')
+    def test_get_json(self, test_url, test_payload, mock_data):
+        mock_json = Mock(return_value=test_payload)
         mock_data.return_value.json = mock_json
         result = get_json(test_url)
-        self.assertEqual(result, test_deployed)
+        self.assertEqual(result, test_payload)
         mock_data.assert_called_once_with(test_url)
 
 
